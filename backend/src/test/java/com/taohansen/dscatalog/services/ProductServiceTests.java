@@ -82,14 +82,12 @@ public class ProductServiceTests {
 
     @Test
     public void findByIdShouldThrowExceptionWhenIdNonExists() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            service.findById(nonExistingId);
-        });
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.findById(nonExistingId));
     }
 
     @Test
     public void findAllPagedShouldReturnPage() {
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(0, 10);
         Page<ProductDTO> result = service.findAllPaged(pageable);
 
         Assertions.assertNotNull(result);
@@ -107,30 +105,25 @@ public class ProductServiceTests {
 
     @Test
     public void updateShouldThrowExceptionWhenIdNonExists() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            service.update(nonExistingId, Factory.createProductDTO());
-        });
+        Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> service.update(nonExistingId, Factory.createProductDTO()));
     }
 
     @Test
     public void deleteShouldThrowDatabaseExceptionWhenIdDependent() {
-        Assertions.assertThrows(DatabaseException.class, () -> {
-            service.delete(dependentId);
-        });
+        Assertions.assertThrows(DatabaseException.class,
+                () -> service.delete(dependentId));
     }
 
     @Test
     public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            service.delete(nonExistingId);
-        });
+        Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> service.delete(nonExistingId));
     }
 
     @Test
     public void deleteShouldDoNothingWhenIdExists() {
-        Assertions.assertDoesNotThrow(() -> {
-            service.delete(existingId);
-        });
+        Assertions.assertDoesNotThrow(() -> service.delete(existingId));
         Mockito.verify(repository, Mockito.times(1)).deleteById(existingId);
     }
 
