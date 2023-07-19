@@ -44,7 +44,7 @@ public class Product {
         this.date = date;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
