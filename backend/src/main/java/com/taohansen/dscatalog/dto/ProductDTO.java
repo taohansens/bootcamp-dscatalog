@@ -2,6 +2,11 @@ package com.taohansen.dscatalog.dto;
 
 import com.taohansen.dscatalog.entities.Category;
 import com.taohansen.dscatalog.entities.Product;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.URL;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -10,10 +15,16 @@ import java.util.Set;
 
 public class ProductDTO {
     private Long id;
+    @Size(min = 3, max = 20, message = "O nome deve ter entre 3 e 20 caracteres")
+    @NotBlank(message = "Campo obrigatório")
     private String name;
+    @NotBlank(message = "Campo obrigatório")
     private String description;
+    @Positive(message = "Preço deve ser um valor positivo")
     private Double price;
+    @URL(message = "Favor entrar com uma URL válida")
     private String imgUrl;
+    @PastOrPresent(message = "A data do produto não pode ser futura")
     private Instant date;
     private List<CategoryDTO> categories = new ArrayList<>();
 
