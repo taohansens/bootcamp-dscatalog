@@ -9,12 +9,12 @@ import com.taohansen.dscatalog.repositories.CategoryRepository;
 import com.taohansen.dscatalog.repositories.ProductRepository;
 import com.taohansen.dscatalog.services.exceptions.DatabaseException;
 import com.taohansen.dscatalog.services.exceptions.ResourceNotFoundException;
+import com.taohansen.dscatalog.util.Utils;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,18 +37,18 @@ public class ProductService {
     public Page<ProductDTO> findAllPaged(String name, String categoryId, Pageable pageable) {
         List<Long> categoryIds = List.of();
         if(!"0".equals(categoryId)){
-            categoryIds = Arrays.asList(categoryId.split(",")).stream().map(Long::parseLong).toList();
+            categoryIds = Arrays.stream(categoryId.split(",")).map(Long::parseLong).toList();
         }
         Page<ProductProjection> page = repository.searchProducts(categoryIds, name, pageable );
         List<Long> productIds = page.map(ProductProjection::getId).toList();
 
         List<Product> entities = repository.searchProductsWithCategories(productIds);
 
+        entities = (List<Product>) Utils.replace(page.getContent(), entities);
+
         List<ProductDTO> dtos = entities.stream().map(p -> new ProductDTO(p,p.getCategories())).toList();
 
-        Page<ProductDTO> pageDTO = new PageImpl<>(dtos, page.getPageable(), page.getTotalElements());
-
-        return pageDTO;
+        return new PageImpl<>(dtos, page.getPageable(), page.getTotalElements());
     }
 
     @Transactional(readOnly = true)
@@ -91,7 +91,7 @@ public class ProductService {
     }
 
     private void copyDtoToEntity(ProductDTO dto, Product entity) {
-        entity.setName(dto.getName());;
+        entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
         entity.setDate(dto.getDate());
         entity.setImgUrl(dto.getImgUrl());
